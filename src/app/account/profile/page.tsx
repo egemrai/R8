@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Button } from "@/components/ui/button"
 import AccountLeftPanel from "@/components/Account-left-panel"
 
-export async function UserInfoPage() {
+export async function ProfilePage() {
 
     return (
         <>
@@ -17,6 +17,7 @@ export async function UserInfoPage() {
                 <h1 className={`${style.egem} font-bold text-5xl text-end`}>renk güzel</h1>
                 <div className={`${style.grid_div}`}>
                     <AccountLeftPanel />
+
                     <div>
                         <Dialog >
                             <DialogTrigger asChild>
@@ -47,4 +48,4 @@ export async function UserInfoPage() {
 
 }
 
-export default UserInfoPage
+export default ProfilePage
