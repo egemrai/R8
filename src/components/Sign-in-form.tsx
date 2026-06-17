@@ -25,6 +25,7 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { authClient } from "@/lib/auth-client"
 import { useEffect, useState } from "react"
+import { Eye, EyeOff } from "lucide-react"
 
 
 export function SignInForm() {
@@ -36,6 +37,8 @@ export function SignInForm() {
         isPending,
     } = authClient.useSession()
 
+    const [passwordInputType, setPasswordInputType] = useState<"text" | "password">('password')
+
     useEffect(() => {
         if (session) {
             router.push("/")
@@ -45,12 +48,12 @@ export function SignInForm() {
     const formSchema = z.object({
         username: z
             .string()
-            .min(1, "Username must be at least 4 characters.")
-            .max(40, "Bug title must be at most 32 characters."),
+            .min(1, "Username must be at least 1 characters.")
+            .max(32, "Username must be at most 32 characters."),
         password: z
             .string()
-            .min(1, "Password must be at least 4 characters.")
-            .max(80, "Password must be at most 32 characters."),
+            .min(1, "Password must be at least 1 characters.")
+            .max(32, "Password must be at most 32 characters."),
 
     })
 
@@ -122,13 +125,27 @@ export function SignInForm() {
                                     <FieldLabel htmlFor="password">
                                         Password
                                     </FieldLabel>
-                                    <Input
-                                        {...field}
-                                        id="password"
-                                        aria-invalid={fieldState.invalid}
-                                        placeholder="..."
-                                        autoComplete="off"
-                                    />
+                                    <div className="relative">
+                                        <Input className="pr-10"
+                                            {...field}
+                                            id="password"
+                                            aria-invalid={fieldState.invalid}
+                                            placeholder="..."
+                                            autoComplete="off"
+                                            type={passwordInputType}
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => setPasswordInputType(prev => prev === 'password' ? 'text' : 'password')}
+                                            className="absolute right-4 top-1/2 -translate-y-1/2"
+                                        >
+                                            {passwordInputType === 'password' ? (
+                                                <EyeOff className="h-4 w-4" />
+                                            ) : (
+                                                <Eye className="h-4 w-4" />
+                                            )}
+                                        </button>
+                                    </div>
                                     {fieldState.invalid && (
                                         <FieldError errors={[fieldState.error]} />
                                     )}

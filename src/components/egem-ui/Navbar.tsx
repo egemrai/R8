@@ -67,6 +67,10 @@ export function Navbar() {
                                     </DropdownMenuItem>
 
                                     <DropdownMenuItem asChild>
+                                        <Link href="/account/user-info">User info</Link>
+                                    </DropdownMenuItem>
+
+                                    <DropdownMenuItem asChild>
                                         <Link onClick={() => authClient.signOut()} href="/">Sign Out</Link>
                                     </DropdownMenuItem>
                                 </DropdownMenuContent>
@@ -76,6 +80,7 @@ export function Navbar() {
                         {/* MOBILE DROPDOWN */}
                         <div className="min-[600px]:hidden bg-amber-500">
                             <DropdownMenu>
+
                                 <DropdownMenuTrigger asChild>
                                     <button className="p-2 rounded-md hover:bg-muted">
                                         <Menu className="h-5 w-5" />
@@ -83,17 +88,31 @@ export function Navbar() {
                                 </DropdownMenuTrigger>
 
                                 <DropdownMenuContent align="end" className="w-40">
-                                    <DropdownMenuItem asChild>
-                                        <Link href="/login">Login</Link>
-                                    </DropdownMenuItem>
+                                    <DropdownMenu>
+                                        <DropdownMenuTrigger asChild>
+                                            <button className={`  hover:text-amber-500 hover:cursor-pointer`}>
+                                                {username}
+                                            </button>
+                                        </DropdownMenuTrigger>
+
+                                        <DropdownMenuContent align="end" className="w-40">
+                                            <DropdownMenuItem asChild>
+                                                <Link href="/profile">Profile</Link>
+                                            </DropdownMenuItem>
+                                            <DropdownMenuItem asChild>
+                                                <Link href="/account/user-info">User info</Link>
+                                            </DropdownMenuItem>
+
+                                            <DropdownMenuItem asChild>
+                                                <Link onClick={() => authClient.signOut()} href="/">Sign Out</Link>
+                                            </DropdownMenuItem>
+                                        </DropdownMenuContent>
+                                    </DropdownMenu>
 
                                     <DropdownMenuItem asChild>
                                         <Link href="/profile">Profile</Link>
                                     </DropdownMenuItem>
 
-                                    <DropdownMenuItem asChild>
-                                        <Link href="/product">Product</Link>
-                                    </DropdownMenuItem>
                                 </DropdownMenuContent>
                             </DropdownMenu>
                         </div>
@@ -110,31 +129,6 @@ export function Navbar() {
 
 
                         </nav>
-
-                        {/* MOBILE DROPDOWN */}
-                        <div className="min-[600px]:hidden bg-amber-500">
-                            <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                    <button className="p-2 rounded-md hover:bg-muted">
-                                        <Menu className="h-5 w-5" />
-                                    </button>
-                                </DropdownMenuTrigger>
-
-                                <DropdownMenuContent align="end" className="w-40">
-                                    <DropdownMenuItem asChild>
-                                        <Link href="/login">Login</Link>
-                                    </DropdownMenuItem>
-
-                                    <DropdownMenuItem asChild>
-                                        <Link href="/profile">Profile</Link>
-                                    </DropdownMenuItem>
-
-                                    <DropdownMenuItem asChild>
-                                        <Link href="/product">Product</Link>
-                                    </DropdownMenuItem>
-                                </DropdownMenuContent>
-                            </DropdownMenu>
-                        </div>
 
                     </>
                 }

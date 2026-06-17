@@ -59,6 +59,8 @@ export const auth = betterAuth({
 
     emailAndPassword: {
         enabled: true,
+        minPasswordLength: 1,
+        maxPasswordLength: 32,
     },
     plugins: [nextCookies(), username()],
     user: {
