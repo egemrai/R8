@@ -6,7 +6,7 @@ import {
 import Link from "next/link"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
-import AccountLeftPanel from "@/components/Account-left-panel"
+import AccountLeftPanel from "@/components/account/account-left-panel"
 
 export async function UserInfoPage() {
 

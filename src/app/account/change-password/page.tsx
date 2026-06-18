@@ -4,8 +4,8 @@ import {
     Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle,
 } from "@/components/ui/card"
 import Link from "next/link"
-import { ChangePasswordForm } from "@/components/Change-password-form"
-import AccountLeftPanel from "@/components/Account-left-panel"
+import { ChangePasswordForm } from "@/components/account/change-password-form"
+import AccountLeftPanel from "@/components/account/account-left-panel"
 
 export async function UserInfoPage() {
 

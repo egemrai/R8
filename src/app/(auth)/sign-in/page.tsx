@@ -1,5 +1,5 @@
 import { Container } from "@/components/egem-ui/Container"
-import { SignInForm } from "@/components/Sign-in-form"
+import { SignInForm } from "@/components/auth/sign-in-form"
 import Image from "next/image"
 
 interface UserPageProps {
