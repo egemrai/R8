@@ -67,7 +67,7 @@ export function AccountProfile() {
         accept: {
             "image/*": [],
         },
-        multiple: false,
+        multiple: true,
     })
 
 
