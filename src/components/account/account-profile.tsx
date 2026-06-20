@@ -6,6 +6,7 @@ import { Button } from "../ui/button"
 import { authClient } from "@/lib/auth-client"
 import { useCallback, useState } from "react"
 import { useDropzone } from "react-dropzone"
+import { CldImage } from "next-cloudinary"
 
 export function AccountProfile() {
 
@@ -23,7 +24,7 @@ export function AccountProfile() {
         formData.append("file", file)
         formData.append("upload_preset", "profile_images")
 
-        const res = await fetch(
+        const res = await fetch(  // console.log image-cloudinary-POST-fetch-return içinde var
             `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`,
             {
                 method: "POST",
@@ -33,7 +34,9 @@ export function AccountProfile() {
 
         const data = await res.json()
 
-        return data.secure_url
+        console.log('imgdata:', data)
+
+        return data.public_id  //secure?url verince cldimage çalışmıyor, public_id istiyor
     }
 
     const onDrop = useCallback(async (acceptedFiles: File[]) => {
@@ -73,13 +76,16 @@ export function AccountProfile() {
 
     return (
         <Card className="flex flex-col">
-
-            <img
-                src={session?.user?.image || ''}
-                width={400}
-                height={400}
-                alt="avatar"
-            />
+            {session &&
+                <>
+                    <CldImage
+                        src={session?.user?.image || ''}
+                        width={400}
+                        height={400}
+                        alt="avatar"
+                    />
+                </>
+            }
 
             <Dialog >
                 <DialogTrigger asChild>
