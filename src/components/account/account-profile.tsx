@@ -9,6 +9,7 @@ import { useDropzone } from "react-dropzone"
 import { CldImage } from "next-cloudinary"
 import Cropper from 'react-easy-crop'
 import { getCroppedImg } from "@/lib/cropImage"
+import { Edit } from "lucide-react"
 
 export function AccountProfile() {
 
@@ -123,119 +124,127 @@ export function AccountProfile() {
 
 
     return (
-        <Card className="flex flex-col">
-            {session &&
-                <>
-                    <CldImage
-                        src={session?.user?.image || ''}
-                        width={100}
-                        height={100}
-                        alt="avatar"
-                        className="rounded-full"
-                        radius='max'
-                    />
-                </>
-            }
+        <Card className="flex flex-col p-4 border">
+            <div className="flex flex-row w-full h-full items-center gap-4">
+                {session &&
+                    <>
+                        <CldImage
+                            src={session?.user?.image || ''}
+                            width={100}
+                            height={100}
+                            alt="avatar"
+                            className="rounded-full"
+                            radius='max'
+                        />
+                    </>
+                }
 
-            <Dialog >
-                <DialogTrigger asChild>
-                    <Button>Change profile picture</Button>
-                </DialogTrigger>
-                <DialogContent>
-                    <DialogHeader>
-                        <DialogTitle>Change profile picture</DialogTitle>
-                    </DialogHeader>
+                <Dialog >
+                    <DialogTrigger asChild>
+                        <Button className="bg-blue-500 text-white rounded-full w-10 h-10 cursor-pointer">
+                            <Edit />
+                        </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                        <DialogHeader>
+                            <DialogTitle>Change profile picture</DialogTitle>
+                        </DialogHeader>
 
-                    <div className="mx-auto max-w-lg">
-                        <div
-                            {...getRootProps()}
-                            className={`
+                        <div className="mx-auto max-w-lg">
+                            <div
+                                {...getRootProps()}
+                                className={`
                     group cursor-pointer rounded-2xl border-2 border-dashed p-10
                     transition-all duration-200
                     ${isDragActive
-                                    ? "border-blue-500 bg-blue-50"
-                                    : "border-zinc-300 hover:border-zinc-400 hover:bg-zinc-50"
-                                }
+                                        ? "border-blue-500 bg-blue-50"
+                                        : "border-zinc-300 hover:border-zinc-400 hover:bg-zinc-50"
+                                    }
                 `}
-                        >
-                            <input {...getInputProps()} />
+                            >
+                                <input {...getInputProps()} />
 
-                            <div className="flex flex-col items-center gap-4 text-center">
-                                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-zinc-100 text-3xl">
-                                    📷
-                                </div>
+                                <div className="flex flex-col items-center gap-4 text-center">
+                                    <div className="flex h-16 w-16 items-center justify-center rounded-full bg-zinc-100 text-3xl">
+                                        📷
+                                    </div>
 
-                                {isUploading ? (
-                                    <>
-                                        <div className="h-6 w-6 animate-spin rounded-full border-2 border-zinc-300 border-t-black" />
-                                        <p className="font-medium">
-                                            Fotoğraf yükleniyor...
-                                        </p>
-                                    </>
-                                ) : (
-                                    <>
-                                        <div>
-                                            <h3 className="text-lg font-semibold">
-                                                Profil fotoğrafı yükle
-                                            </h3>
-
-                                            <p className="mt-1 text-sm text-zinc-500">
-                                                Sürükleyip bırak veya seçmek için tıkla
+                                    {isUploading ? (
+                                        <>
+                                            <div className="h-6 w-6 animate-spin rounded-full border-2 border-zinc-300 border-t-black" />
+                                            <p className="font-medium">
+                                                Fotoğraf yükleniyor...
                                             </p>
-                                        </div>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <div>
+                                                <h3 className="text-lg font-semibold">
+                                                    Profil fotoğrafı yükle
+                                                </h3>
 
-                                        <button
-                                            type="button"
-                                            className="rounded-lg bg-black px-4 py-2 text-sm font-medium text-white"
-                                        >
-                                            Dosya Seç
-                                        </button>
-                                    </>
-                                )}
+                                                <p className="mt-1 text-sm text-zinc-500">
+                                                    Sürükleyip bırak veya seçmek için tıkla
+                                                </p>
+                                            </div>
+
+                                            <button
+                                                type="button"
+                                                className="rounded-lg bg-black px-4 py-2 text-sm font-medium text-white"
+                                            >
+                                                Dosya Seç
+                                            </button>
+                                        </>
+                                    )}
+                                </div>
                             </div>
-                        </div>
 
-                        {previewUrl &&
-                            <div className="mt-6">
-                                <div className="relative h-100 w-full">
-                                    <Cropper
-                                        image={previewUrl}
-                                        crop={crop}
-                                        zoom={zoom}
-                                        aspect={1}
-                                        cropShape="round"
-                                        showGrid={false}
-                                        onCropChange={setCrop}
-                                        onZoomChange={setZoom}
-                                        onCropComplete={onCropComplete}
+                            {previewUrl &&
+                                <div className="mt-6">
+                                    <div className="relative h-96 w-full">
+                                        <Cropper
+                                            image={previewUrl}
+                                            crop={crop}
+                                            zoom={zoom}
+                                            aspect={1}
+                                            cropShape="round"
+                                            showGrid={false}
+                                            onCropChange={setCrop}
+                                            onZoomChange={setZoom}
+                                            onCropComplete={onCropComplete}
+                                        />
+                                    </div>
+
+                                    <input
+                                        type="range"
+                                        min={1}
+                                        max={3}
+                                        step={0.04}
+                                        value={zoom}
+                                        onChange={(e) => setZoom(Number(e.target.value))}
+                                        className="mt-4 w-full"
                                     />
                                 </div>
 
-                                <input
-                                    type="range"
-                                    min={1}
-                                    max={3}
-                                    step={0.1}
-                                    value={zoom}
-                                    onChange={(e) => setZoom(Number(e.target.value))}
-                                    className="mt-4 w-full"
-                                />
-                            </div>
-
-                        }
-                    </div>
+                            }
+                        </div>
 
 
 
-                    <Button
-                        onClick={handleConfirm}
-                        disabled={!selectedFile || isUploading}
-                    >
-                        {isUploading ? "Uploading..." : "Confirm"}
-                    </Button>
-                </DialogContent>
+                        <Button
+                            onClick={handleConfirm}
+                            disabled={!selectedFile || isUploading}
+                        >
+                            {isUploading ? "Uploading..." : "Confirm"}
+                        </Button>
+                    </DialogContent>
 
-            </Dialog>
+                </Dialog>
+
+            </div>
+
+
+
 
         </Card>
     )
