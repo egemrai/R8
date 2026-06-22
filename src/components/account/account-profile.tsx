@@ -7,16 +7,33 @@ import { authClient } from "@/lib/auth-client"
 import { useCallback, useState } from "react"
 import { useDropzone } from "react-dropzone"
 import { CldImage } from "next-cloudinary"
+import Cropper from 'react-easy-crop'
+import { getCroppedImg } from "@/lib/cropImage"
 
 export function AccountProfile() {
 
-    const [imageUrl, setImageUrl] = useState("")
+
     const [isUploading, setIsUploading] = useState(false)
+
+    const [selectedFile, setSelectedFile] = useState<File | null>(null)
+    const [previewUrl, setPreviewUrl] = useState("")
+
+    const [crop, setCrop] = useState({ x: 0, y: 0 })
+    const [zoom, setZoom] = useState(1)
+    const [croppedAreaPixels, setCroppedAreaPixels] = useState<any>(null)
 
     const {
         data: session,
         isPending,
     } = authClient.useSession()
+
+    const onCropComplete = useCallback(
+        (_: any, croppedAreaPixels: any) => {
+            console.log('croppedAreaPixels:', croppedAreaPixels)
+            setCroppedAreaPixels(croppedAreaPixels)
+        },
+        []
+    )
 
     async function uploadImage(file: File) {
         const formData = new FormData()
@@ -39,17 +56,26 @@ export function AccountProfile() {
         return data.public_id  //secure?url verince cldimage çalışmıyor, public_id istiyor
     }
 
-    const onDrop = useCallback(async (acceptedFiles: File[]) => {
-        const file = acceptedFiles[0]
-
-        if (!file) return
+    async function handleConfirm() {
+        if (!selectedFile || !croppedAreaPixels) return
 
         try {
             setIsUploading(true)
 
-            const url = await uploadImage(file)
+            const croppedBlob = await getCroppedImg(
+                previewUrl,
+                croppedAreaPixels
+            )
 
-            setImageUrl(url)
+            const croppedFile = new File(
+                [croppedBlob],
+                "avatar.png",
+                {
+                    type: "image/png",
+                }
+            )
+
+            const publicId = await uploadImage(croppedFile)
 
             await fetch("/api/user/image", {
                 method: "POST",
@@ -57,11 +83,33 @@ export function AccountProfile() {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
-                    image: url,
+                    image: publicId,
                 }),
             })
-        } finally {
+
+        } catch (error) {
+            console.log(error)
+        }
+        finally {
             setIsUploading(false)
+        }
+    }
+
+    const onDrop = useCallback(async (acceptedFiles: File[]) => {
+        const file = acceptedFiles[0]
+
+        if (!file) return
+
+        try {
+
+            setSelectedFile(file)
+
+            const localPreview = URL.createObjectURL(file)
+
+            setPreviewUrl(localPreview)
+
+        } catch (error) {
+            console.error(error)
         }
     }, [])
 
@@ -70,7 +118,7 @@ export function AccountProfile() {
         accept: {
             "image/*": [],
         },
-        multiple: true,
+        multiple: false,
     })
 
 
@@ -80,9 +128,11 @@ export function AccountProfile() {
                 <>
                     <CldImage
                         src={session?.user?.image || ''}
-                        width={400}
-                        height={400}
+                        width={100}
+                        height={100}
                         alt="avatar"
+                        className="rounded-full"
+                        radius='max'
                     />
                 </>
             }
@@ -145,20 +195,44 @@ export function AccountProfile() {
                             </div>
                         </div>
 
-                        {imageUrl && (
-                            <div className="mt-6 flex justify-center">
-                                <img
-                                    src={imageUrl}
-                                    alt="Profil fotoğrafı"
-                                    className="h-40 w-40 rounded-2xl object-cover shadow"
+                        {previewUrl &&
+                            <div className="mt-6">
+                                <div className="relative h-100 w-full">
+                                    <Cropper
+                                        image={previewUrl}
+                                        crop={crop}
+                                        zoom={zoom}
+                                        aspect={1}
+                                        cropShape="round"
+                                        showGrid={false}
+                                        onCropChange={setCrop}
+                                        onZoomChange={setZoom}
+                                        onCropComplete={onCropComplete}
+                                    />
+                                </div>
+
+                                <input
+                                    type="range"
+                                    min={1}
+                                    max={3}
+                                    step={0.1}
+                                    value={zoom}
+                                    onChange={(e) => setZoom(Number(e.target.value))}
+                                    className="mt-4 w-full"
                                 />
                             </div>
-                        )}
+
+                        }
                     </div>
 
 
 
-                    <Button>Confirm</Button>
+                    <Button
+                        onClick={handleConfirm}
+                        disabled={!selectedFile || isUploading}
+                    >
+                        {isUploading ? "Uploading..." : "Confirm"}
+                    </Button>
                 </DialogContent>
 
             </Dialog>
