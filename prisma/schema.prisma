@@ -22,6 +22,12 @@ model User {
   username      String    @unique
   displayUsername String?
 
+  comments Comment[]
+  likes    Like[]
+
+  followers Follow[] @relation("Followers")
+  following Follow[] @relation("Following")
+
   sessions      Session[]
   accounts      Account[]
 
@@ -49,9 +55,64 @@ model Post {
   content   String?
   published Boolean @default(false)
 
+  images   PostImage[]  
+  comments Comment[]
+  likes    Like[]
+
   authorId  String
   author    User    @relation(fields: [authorId], references: [id])
   
+}
+
+model PostImage {
+  id     String @id @default(cuid())
+  publicUrl    String
+  secureUrl    String
+
+  postId String
+  post   Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+}
+
+model Comment {
+  id      String @id @default(cuid())
+  content String
+
+  postId  String
+  post    Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  authorId String
+  author   User @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Like {
+  id String @id @default(cuid())
+
+  userId String
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  postId String
+  post   Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@unique([userId, postId])
+}
+
+model Follow {
+  id String @id @default(cuid())
+
+  followerId String
+  follower   User @relation("Following", fields: [followerId], references: [id], onDelete: Cascade)
+
+  followingId String
+  following   User @relation("Followers", fields: [followingId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@unique([followerId, followingId])
 }
 
 model Account {

@@ -78,15 +78,30 @@ export function AccountProfile() {
 
             const publicId = await uploadImage(croppedFile)
 
-            await fetch("/api/user/image", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    image: publicId,
-                }),
-            })
+            if (publicId) {
+                const res = await fetch("/api/user/add-image", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        image: publicId,
+                    }),
+                })
+
+                const data = await res.json()
+                //alttaki databaseden önceki user pp silme requesti. bullmq yükleyince q'ya ekle
+                if (data.success && session?.user?.image) {
+                    await fetch("/api/user/delete-image", {
+                        method: "POST",
+                        body: JSON.stringify({
+                            publicId: session?.user?.image,
+                        }),
+                    })
+
+                }
+            }
+
 
         } catch (error) {
             console.log(error)
