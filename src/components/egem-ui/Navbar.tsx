@@ -53,7 +53,7 @@ export function Navbar() {
                         {/* DESKTOP NAV */}
                         < nav className="hidden min-[601px]:flex items-center gap-6">
 
-                            {/* <Link className={pathname === "/profile" ? "text-red-500" : "text-white"} href="/profile">Profile</Link> */}
+                            <Link className={pathname === "/profile" ? "text-red-500" : "text-white"} href="/profile">Create post</Link>
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
                                     <button className={`outline-none text-white hover:text-amber-500 hover:cursor-pointer`}>

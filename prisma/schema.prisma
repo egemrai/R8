@@ -59,6 +59,9 @@ model Post {
   comments Comment[]
   likes    Like[]
 
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   authorId  String
   author    User    @relation(fields: [authorId], references: [id])
   
@@ -68,6 +71,8 @@ model PostImage {
   id     String @id @default(cuid())
   publicUrl    String
   secureUrl    String
+  width Int
+  height    Int
 
   postId String
   post   Post @relation(fields: [postId], references: [id], onDelete: Cascade)
