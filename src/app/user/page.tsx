@@ -7,8 +7,10 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { CldImage } from "next-cloudinary"
 import { Button } from "@/components/ui/button"
 import { authClient } from "@/lib/auth-client"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import Link from "next/link"
 
-export default function UserProfile() {
+export default function UserProfilePage() {
 
     const { data: session, isPending } = authClient.useSession()
 
@@ -114,11 +116,27 @@ export default function UserProfile() {
                                         </Button>
                                     </div>
                                     :
-                                    <div className="flex flex-row">
-                                        <Button onClick={() => console.log('session:', session)}>
-                                            Takip
-                                        </Button>
-                                        <Button>
+                                    <div className="flex flex-row gap-2 h-8">
+
+                                        <DropdownMenu >
+                                            <DropdownMenuTrigger asChild>
+                                                <button className={`h-full rounded-sm min-w-30 bg-black  text-white hover:text-amber-500 hover:cursor-pointer`}>
+                                                    {'following'}
+                                                </button>
+                                            </DropdownMenuTrigger>
+
+                                            <DropdownMenuContent align="end" className="w-40">
+                                                <DropdownMenuItem asChild>
+                                                    <Link href="/profile">Profile</Link>
+                                                </DropdownMenuItem>
+
+                                                <DropdownMenuItem asChild>
+                                                    <Link href="/account/user-info">engelleme ekle</Link>
+                                                </DropdownMenuItem>
+                                            </DropdownMenuContent>
+                                        </DropdownMenu>
+                                        <Button onClick={() => console.log('session:', session)}
+                                            className="h-full min-w-30 rounded-sm">
                                             Message
                                         </Button>
                                     </div>}

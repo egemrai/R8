@@ -160,7 +160,7 @@ export function AccountProfile() {
                             <Edit />
                         </Button>
                     </DialogTrigger>
-                    <DialogContent>
+                    <DialogContent className="w-[95vw] max-w-lg max-h-[90vh] overflow-y-auto">
                         <DialogHeader>
                             <DialogTitle>Change profile picture</DialogTitle>
                         </DialogHeader>
@@ -180,32 +180,40 @@ export function AccountProfile() {
                                 <input {...getInputProps()} />
 
                                 <div className="flex flex-col items-center gap-4 text-center">
-                                    <div className="flex h-16 w-16 items-center justify-center rounded-full bg-zinc-100 text-3xl">
+                                    <div className="flex items-center justify-center rounded-full bg-zinc-100
+                                                    h-12 w-12 text-2xl
+                                                    sm:h-14 sm:w-14 sm:text-3xl
+                                                    md:h-16 md:w-16">
                                         📷
                                     </div>
 
                                     {isUploading ? (
                                         <>
-                                            <div className="h-6 w-6 animate-spin rounded-full border-2 border-zinc-300 border-t-black" />
-                                            <p className="font-medium">
+                                            <div className="h-5 w-5
+                                                            sm:h-6 sm:w-6
+                                                            animate-spin rounded-full border-2
+                                                            border-zinc-300 border-t-black" />
+                                            <p className="text-sm sm:text-base font-medium">
                                                 Fotoğraf yükleniyor...
                                             </p>
                                         </>
                                     ) : (
                                         <>
                                             <div>
-                                                <h3 className="text-lg font-semibold">
+                                                <h3 className="text-base sm:text-lg font-semibold">
                                                     Profil fotoğrafı yükle
                                                 </h3>
 
-                                                <p className="mt-1 text-sm text-zinc-500">
+                                                <p className="mt-1 text-xs sm:text-sm text-zinc-500">
                                                     Sürükleyip bırak veya seçmek için tıkla
                                                 </p>
                                             </div>
 
                                             <button
                                                 type="button"
-                                                className="rounded-lg bg-black px-4 py-2 text-sm font-medium text-white"
+                                                className="rounded-lg bg-black text-white font-medium
+                                                            px-3 py-2 text-xs
+                                                            sm:px-4 sm:text-sm"
                                             >
                                                 Dosya Seç
                                             </button>
@@ -216,7 +224,7 @@ export function AccountProfile() {
 
                             {previewUrl &&
                                 <div className="mt-6">
-                                    <div className="relative h-96 w-full">
+                                    <div className="relative h-64 sm:h-80 md:h-96 w-full">
                                         <Cropper
                                             image={previewUrl}
                                             crop={crop}
