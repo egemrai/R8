@@ -49,7 +49,8 @@ export function SignInForm() {
         username: z
             .string()
             .min(1, "Username must be at least 1 characters.")
-            .max(32, "Username must be at most 32 characters."),
+            .max(32, "Username must be at most 32 characters.")
+            .regex(/^[a-z](?:[a-z0-9]|[_.](?![_.])){0,31}$/, "Invalid username format"),
         password: z
             .string()
             .min(1, "Password must be at least 1 characters.")
@@ -93,7 +94,7 @@ export function SignInForm() {
 
             </CardHeader>
             <CardContent>
-                <form id="sign-up-form" onSubmit={form.handleSubmit(onSubmit)}>
+                <form id="sign-in-form" onSubmit={form.handleSubmit(onSubmit)}>
                     <FieldGroup>
                         <Controller
                             name="username"
@@ -158,7 +159,7 @@ export function SignInForm() {
             <CardFooter>
                 <Field orientation="vertical">
 
-                    <Button className="bg-blue-500" type="submit" variant="outline" form="sign-up-form">
+                    <Button className="bg-blue-500" type="submit" variant="outline" form="sign-in-form">
                         Sign in
                     </Button>
                     <Link className="text-center underline" href={`/sign-up`}>

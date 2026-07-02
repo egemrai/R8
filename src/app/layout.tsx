@@ -34,9 +34,7 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col">
         <Navbar />
-        <Container className={'grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-6'}> {/*ekran büyük olursa 2-1 grid, küçülürse 1 grid*/}
-          {children}
-        </Container>
+        {children}
 
         <Toaster />
       </body>

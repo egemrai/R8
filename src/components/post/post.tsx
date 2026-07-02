@@ -40,14 +40,15 @@ export function Post() {
 
         <Card className="flex flex-col">
             <CardHeader className="flex flex-row gap-2 items-center ">
-                <CldImage
-                    src={session?.user?.image || ''}
-                    width={50}
-                    height={50}
-                    alt="avatar"
-                    className="rounded-full"
-                    radius='max'
-                />
+                {session?.user?.image &&
+                    <CldImage
+                        src={session?.user?.image}
+                        width={50}
+                        height={50}
+                        alt="avatar"
+                        className="rounded-full"
+                        radius='max'
+                    />}
                 <p className="overflow-hidden">
                     {session?.user.username + 'slkdmaklwefmklwaefwealefamwlefmawlkefmawelfkmawlfmawlfkmaewlfmawlkfemklwaeflsdfmawlfmwalkfkew'}
                 </p>

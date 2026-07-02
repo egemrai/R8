@@ -17,7 +17,7 @@ export default async function UserPage({ params, searchParams, propTest }: UserP
 
     return (
         <>
-            <Container>
+            <Container className={' border-2'}>
                 <div className="min-h-screen flex items-center justify-center">
 
                     <SignInForm />

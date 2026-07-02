@@ -10,6 +10,7 @@ import { CldImage } from "next-cloudinary"
 import Cropper from 'react-easy-crop'
 import { getCroppedImg } from "@/lib/cropImage"
 import { Edit } from "lucide-react"
+import Image from "next/image"
 
 export function AccountProfile() {
 
@@ -22,6 +23,8 @@ export function AccountProfile() {
     const [crop, setCrop] = useState({ x: 0, y: 0 })
     const [zoom, setZoom] = useState(1)
     const [croppedAreaPixels, setCroppedAreaPixels] = useState<any>(null)
+
+    const [usernameFirstLetter, setusernameFirstLetter] = useState<string>('e')
 
     const {
         data: session,
@@ -141,10 +144,10 @@ export function AccountProfile() {
     return (
         <Card className="flex flex-col p-4 border">
             <div className="flex flex-row w-full h-full items-center gap-4">
-                {session &&
+                {session?.user?.image ?
                     <>
                         <CldImage
-                            src={session?.user?.image || ''}
+                            src={session?.user?.image}
                             width={100}
                             height={100}
                             alt="avatar"
@@ -152,6 +155,16 @@ export function AccountProfile() {
                             radius='max'
                         />
                     </>
+                    : session ?
+                        <Image
+                            src={`/pp/${session.user.username!.charAt(0)}.png`}
+                            width={100}
+                            height={100}
+                            alt="avatar"
+                            className="rounded-full"
+                        />
+                        : <>
+                        </>
                 }
 
                 <Dialog >

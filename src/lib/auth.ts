@@ -11,6 +11,34 @@ export const auth = betterAuth({
     }),
 
     databaseHooks: {
+        user: {
+            create: {
+                before: async (user, ctx) => {
+                    const username = (user as any).username?.trim()
+
+                    if (!username) {
+                        throw new APIError("BAD_REQUEST", {
+                            message: "Username is required",
+                        });
+                    }
+
+                    const normalized = username.toLowerCase()
+
+                    if (!/^[a-z](?:[a-z0-9]|[_.](?![_.])){0,31}$/.test(normalized)) {
+                        throw new APIError("BAD_REQUEST", {
+                            message: "Username must start with a letter and contain only letters, numbers, underscore",
+                        });
+                    }
+
+                    return {
+                        data: {
+                            ...user,
+                            username: normalized,
+                        },
+                    };
+                },
+            },
+        },
         session: {
             create: {
                 before: async (session, ctx) => {
