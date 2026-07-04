@@ -4,11 +4,11 @@ export async function apiHandler(
     callback: () => Promise<Response>
 ) {
     try {
-        console.log('ege2')
+        console.log('apiHandler1')
         return await callback()
 
     } catch (error) {
-        console.log('ege3')
+        console.log('apiHandler2')
         console.error(error)
 
         if (error instanceof ZodError) {

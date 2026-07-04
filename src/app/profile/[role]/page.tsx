@@ -11,14 +11,20 @@ export default async function UserPage({ params, searchParams, propTest }: UserP
     const role = (await params).role
     const name = (await searchParams).name
 
+    // const name = searchParams.name
+
     console.log('role:', role)
     console.log('searchParams:', await searchParams)
     console.log('name:', name)
 
     return (
         <>
-            <div className=" text-white p-4">
+
+            <div className=" text-black p-4">
                 {role.toString()} hg
+            </div>
+            <div className=" text-black p-4">
+                {name.toString()} name
             </div>
         </>
     )

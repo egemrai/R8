@@ -72,10 +72,6 @@ export async function unfollowAction(targetUserId: string) {
 
         const currentUserId = session.user.id
 
-        if (currentUserId === targetUserId) {
-            return { success: false, message: "You cannot unfollow yourself" }
-        }
-
         const existing = await prisma.follow.findFirst({
             where: {
                 followerId: currentUserId,
@@ -83,8 +79,8 @@ export async function unfollowAction(targetUserId: string) {
             },
         })
 
-        if (existing) {
-            return { success: false, message: "Already following" }
+        if (!existing) {
+            return { success: false, message: "Not Following at first" }
         }
 
         await prisma.follow.delete({

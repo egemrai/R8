@@ -10,8 +10,6 @@ export async function GET(req: Request) {
             headers: await headers(),
         })
 
-        const followerId = session?.user.id || ''
-
         const { searchParams } = new URL(req.url)
         const username = searchParams.get("username")
 
@@ -26,7 +24,7 @@ export async function GET(req: Request) {
                 following: true,
                 posts: true,
             },
-        });
+        })
 
         return Response.json({
             user
