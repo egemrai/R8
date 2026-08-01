@@ -1,0 +1,23 @@
+services:
+  frontend:
+    build: .
+    container_name: next-app
+    expose:
+      - "3000"
+    env_file:
+      - .env.production
+    restart: unless-stopped
+
+  nginx:
+    image: nginx:alpine
+    container_name: nginx
+    depends_on:
+      - frontend
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./infra/conf.d:/etc/nginx/conf.d:ro
+      - ./infra/certs:/etc/nginx/certs:ro
+      - /var/www/certbot:/var/www/certbot
+    restart: unless-stopped

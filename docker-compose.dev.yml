@@ -1,0 +1,62 @@
+services:
+  frontend:
+    build: .
+    container_name: next-dev
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/.next
+    environment:
+      #.env override yapmak için -> environment içine .env'e yazıyormuş gibi ekleme yaparak override edilebilir.
+      - NODE_ENV=development
+      - WATCHPACK_POLLING=true
+    depends_on:
+      - redis
+      - elasticsearch
+    command: npm run dev
+    env_file:
+      - .env.development
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.15.3
+    container_name: elasticsearch-dev
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+    ports:
+      - "9200:9200"
+    volumes:
+      - es-data:/usr/share/elasticsearch/data
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -fs http://localhost:9200/_cluster/health || exit 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+
+  worker-email:
+    build: .
+    container_name: email-worker-dev
+    volumes:
+      - .:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+      - WATCHPACK_POLLING=true
+    depends_on:
+      - redis
+      - elasticsearch
+    command: npm run worker:email
+    env_file:
+      - .env.development
+
+volumes:
+  es-data:

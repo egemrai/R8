@@ -52,7 +52,15 @@ export function Post() {
                 <p className="overflow-hidden">
                     {session?.user.username + 'slkdmaklwefmklwaefwealefamwlefmawlkefmawelfkmawlfmawlfkmaewlfmawlkfemklwaeflsdfmawlfmwalkfkew'}
                 </p>
-                <Button className=" ml-auto bg-white text-black">
+                <Button
+                    onClick={async () => {
+                        await fetch(`/api/job-test?username=${username}`)
+                        const user = await fetch(`/api/get-user`)
+                        const jsonUser = await user.json()
+                        console.log('job click3')
+                        console.log('es index res:', jsonUser)
+                    }}
+                    className=" ml-auto bg-white text-black">
                     ...
                 </Button>
 

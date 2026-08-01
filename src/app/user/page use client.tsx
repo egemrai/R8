@@ -11,8 +11,6 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import Image from "next/image"
 import { followAction, unfollowAction } from "../actions/follow"
 
-import { redirect } from "next/navigation"
-
 export default function UserProfilePage() {
 
     const router = useRouter()
@@ -52,7 +50,7 @@ export default function UserProfilePage() {
     const getUserProfileData = async (username: string) => {
         try {
             setUserDataIsLoading(true)
-            const res = await fetch(`/api/user/get-user-profile-data?username=${username}`);
+            const res = await fetch(`/api/user/get-user-profile-data?username=${username}`)
             const jsonRes = await res.json()
             if (jsonRes.user === undefined || null) {
                 return

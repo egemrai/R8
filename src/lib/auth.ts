@@ -99,6 +99,10 @@ export const auth = betterAuth({
                 unique: true,
 
             },
+            role: {
+                type: "string",
+                required: true,
+            },
         },
     },
     rateLimit: {

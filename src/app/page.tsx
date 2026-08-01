@@ -1,5 +1,6 @@
 import { Container } from "@/components/egem-ui/Container"
 import { Post } from "@/components/post/post"
+import { Button } from "@/components/ui/button"
 import Image from "next/image"
 
 export default function Home() {
@@ -12,7 +13,7 @@ export default function Home() {
         <Post />
       </div>
       <div className="bg-primary-400 text-white p-4 hidden lg:block"> {/*ekran büyük olursa mesajlar block, küçük olursa hidden*/}
-        messages
+        messages egew
       </div>
 
     </Container >

@@ -1,0 +1,37 @@
+
+
+
+# Node modules ve build çıktısı
+.next
+node_modules
+dist
+build
+
+# Local config & environment
+.env
+.env.*
+*.log
+
+# Git ve dokümantasyon
+.git
+.gitignore
+Dockerfile
+Dockerfile.dev
+docker-compose.yml
+README.md
+
+# IDE / OS dosyaları
+.vscode
+.idea
+.DS_Store
+Thumbs.db
+
+# Test dosyaları
+coverage
+*.test.*
+*.spec.*
+
+# Yarn/NPM cache
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*

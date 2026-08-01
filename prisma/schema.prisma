@@ -1,3 +1,8 @@
+enum Role {
+  user
+  admin
+}
+
 generator client {
   provider = "prisma-client"
   output   = "../src/generated/prisma"
@@ -13,6 +18,8 @@ model User {
   name  String?
   emailVerified Boolean   @default(false)
   image         String?
+
+  role Role   @default(user)
 
   posts Post[]
 

@@ -1,0 +1,218 @@
+model User {
+  id String @id @default(cuid())
+  username      String    @unique
+  comments Comment[]
+  likes    Like[]
+
+  followers Follow[] @relation("Followers")
+  following Follow[] @relation("Following")
+
+}
+
+model Follow {
+  id String @id @default(cuid())
+
+  followerId String
+  follower   User @relation("Following", fields: [followerId], references: [id], onDelete: Cascade)
+
+  followingId String
+  following   User @relation("Followers", fields: [followingId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@unique([followerId, followingId])
+}
+
+AÇIKLAMA:
+
+Relation isimleri
+
+Bak
+
+follower User @relation("Following")
+
+ve
+
+following User @relation("Followers")
+
+bunlar tamamen ilişkinin adıdır.
+
+Database'de kolon oluşturmaz.
+
+Sadece Prisma'ya şunu söyler:
+
+Bu ilişki "Following" isimli ilişkidir.
+
+ve
+
+Bu ilişki "Followers" isimli ilişkidir.
+
+Yani isim etiketi gibi.
+
+User modeline bakalım
+followers Follow[] @relation("Followers")
+following Follow[] @relation("Following")
+
+Burada da aynı isimler kullanılıyor.
+
+Prisma eşleştiriyor.
+
+User.followers
+        │
+        │ relation("Followers")
+        ▼
+Follow.following
+
+ve
+
+User.following
+        │
+        │ relation("Following")
+        ▼
+Follow.follower
+
+İsimler birebir aynı olmak zorunda.
+
+Bunu tablo gibi gösterelim
+User
+--------------------------------
+followers   ---> Follow.following
+
+following   ---> Follow.follower
+
+Yani
+
+"Followers"
+
+isimli ilişki
+
+şunları bağlıyor:
+
+User.followers
+        ↕
+Follow.following
+
+
+----------------------------------------------------------------------
+Follow[] ne demek?
+
+Şuna bakalım.
+
+followers Follow[]
+
+Bu demek ki
+
+Bir User'ın birden fazla Follow kaydı olabilir.
+--------------------------------------------------------------------------
+
+fields ne?
+
+Bak
+
+follower User
+  @relation(
+      "Following",
+      fields: [followerId],
+      references: [id]
+  )
+
+Burada
+
+fields: [followerId]
+
+şunu diyor:
+
+Bu ilişkinin foreign key'i
+
+followerId
+
+kolonudur.
+
+Yani
+
+Follow
+-------------------
+followerId ---> User.id
+
+bağlantısını kur.
+
+Aynı şekilde
+
+following User
+ @relation(
+   "Followers",
+   fields:[followingId],
+   references:[id]
+ )
+
+demek ki
+
+followingId
+
+şu kullanıcıyı gösteriyor.
+
+Follow.followingId
+          │
+          ▼
+      User.id
+
+
+-------------------------------------------------------------------------------------------------
+Bazen @relation yazarken
+
+model Follow -> follower User @relation("Following", fields: [followerId]) böyle bir kullanım var
+bazen de 
+model Like -> user   User @relation(fields: [userId]) kullanımı var
+
+bunun sebebi Followdan User modeline bağlı 2 ilişki var ve karışmaması için ekstra "Following" var
+
+Like modelinden User modeline sadece 1 ilişki olduğu için ekstra "..." kullanmaya gerek yok
+
+
+
+model Follow {
+  followerId String
+  follower   User @relation("Following", fields: [followerId], references: [id], onDelete: Cascade)
+  followingId String
+  following   User @relation("Followers", fields: [followingId], references: [id], onDelete: Cascade)
+}
+model User {
+  followers Follow[] @relation("Followers")
+  following Follow[] @relation("Following")
+}
+
+model Like {
+  userId String
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  postId String
+  post   Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@unique([userId, postId])
+}
+
+----------------------------------------------------------------------------------------
+Server Action
+Form submit
+Create / Update / Delete
+Login
+Like atma
+Follow etme
+Profil güncelleme
+
+Yani bir şey değiştiriyorsan (mutation).
+
+✅ API Route
+Live search
+Autocomplete
+Infinite scroll
+Filtreleme
+Mobil uygulamanın kullanacağı endpoint
+Başka servislerin erişeceği endpoint
+
+Yani veri okuyorsan (query).
+
+
+
