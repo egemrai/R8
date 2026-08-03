@@ -3,7 +3,7 @@ import { elasticSearchClient } from "@/lib/elasticSearch"
 export async function ensureUsersIndex() {
   try {
     const index = "users"
-    console.log('ensureListIndexe girdi')
+    console.log('users ensureListIndexe girdi')
     const exists = await elasticSearchClient.indices.exists({ index }) // indices --> Elasticsearch’te index’leri oluşturan, silen ve kontrol eden yönetim API'ı sanırım
     if (exists) return
 

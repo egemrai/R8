@@ -1,4 +1,5 @@
-import { indexUsers } from "@/elasticSearch/user/indexDoc";
+import { getFollowsData, indexFollowsToElasticSearch } from "@/elasticSearch/follow/indexFollowsToElasticSearch";
+import { indexUsersToElasticSearch } from "@/elasticSearch/user/indexUsersToElasticSearch";
 import { addEmailJob } from "@/jobs/producers/email";
 import { apiHandler } from "@/lib/api-handler"
 import { auth } from "@/lib/auth";
@@ -8,13 +9,23 @@ import { headers } from "next/headers";
 
 export async function GET(req: Request) {
 
-
-
     try {
+
+        // const res = await getFollowsData()
+        // const res = await indexFollows()
+
+
         const res = await elasticSearchClient.search({
-            index: 'users',
+            index: 'follows',
             size: 100
         })
+
+        // const res = await elasticSearchClient.deleteByQuery({
+        //     index: "users",
+        //     query: {
+        //         match_all: {},
+        //     },
+        // })
 
 
         return Response.json({
@@ -23,7 +34,4 @@ export async function GET(req: Request) {
     } catch (error) {
 
     }
-
-
-
 }

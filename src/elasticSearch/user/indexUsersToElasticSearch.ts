@@ -26,7 +26,7 @@ export async function indexJustOneOffer(doc: any) {
 }
 
 //BULK INDEX USERS  KISMI
-export async function getUserData() {
+export async function getUsersData() {
   try {
     const users = await prisma.user.findMany(
       {
@@ -42,7 +42,7 @@ export async function getUserData() {
 
       return (
         {
-          userId: user.id,
+          id: user.id,
           username: user.username,
           image: user.image,
           followersCount: user.followers.length || 0,
@@ -62,12 +62,12 @@ export async function getUserData() {
 
 }
 
-function setUserIndexBody(users: any) {
+function setUsersIndexBody(users: any) {
   try {
     const body = users.flatMap((user: any) => { // return içinde 2 object return edilmesi gerektiği için '[]' içine almak zorunda kaldım, eklediğim [] kaldırmak için de flatMap kullandım.
-      const { userId, ...userWithNoId } = user
+      const { id, ...userWithNoId } = user
       return (
-        [{ index: { _index: "users", _id: String(userId) } },
+        [{ index: { _index: "users", _id: String(id) } },
         {
           ...userWithNoId,  //document içinde ES id kabul etmediği için çıkardım
         }]
@@ -81,14 +81,14 @@ function setUserIndexBody(users: any) {
 }
 
 
-export async function indexUsers() {
+export async function indexUsersToElasticSearch() {
   try {
-    const usersData = await getUserData()
+    const usersData = await getUsersData()
     if (!usersData) {
       throw new Error("No users data");
     }
 
-    const body = setUserIndexBody(usersData)
+    const body = setUsersIndexBody(usersData)
 
     await ensureUsersIndex()
 
@@ -128,8 +128,8 @@ export async function indexUsers() {
 
     // console.log('users 100% successfully indexed to ES')
     // console.log('users indexed to ES with min 1 error(s)')
-    console.log(`bulk index user-> total: ${total || '?'}, success: ${total - failed.length || '?'}, failed: ${failed.length || '?'}`)
-    return { message: `bulk index user-> total: ${total || '?'}, success: ${total - failed.length || '?'}, failed: ${failed.length || '?'}` }
+    console.log(`bulk index users-> total: ${total || '?'}, success: ${total - failed.length || '?'}, failed: ${failed.length || '?'}`)
+    return { message: `bulk index users-> total: ${total || '?'}, success: ${total - failed.length || '?'}, failed: ${failed.length || '?'}` }
   } catch (error) {
     console.error(error)
   }
