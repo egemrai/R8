@@ -13,34 +13,23 @@ export async function UserInfoPage() {
     return (
         <>
 
-            <Container >
-                <h1 className={`${style.egem} font-bold text-5xl text-end`}>renk güzel</h1>
-                <div className={`${style.grid_div}`}>
-                    <AccountLeftPanel />
-                    <div>
-                        <Dialog >
-                            <DialogTrigger asChild>
-                                <Button>Open dialog</Button>
-                            </DialogTrigger>
-                            <DialogContent>
-                                <DialogHeader>
-                                    <DialogTitle>Change password</DialogTitle>
-                                </DialogHeader>
+            <div>
+                <Dialog >
+                    <DialogTrigger asChild>
+                        <Button>Open dialog</Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                        <DialogHeader>
+                            <DialogTitle>Change password</DialogTitle>
+                        </DialogHeader>
 
-                                <p>Are you sure?</p>
+                        <p>Are you sure?</p>
 
-                                <Button>Confirm</Button>
-                            </DialogContent>
+                        <Button>Confirm</Button>
+                    </DialogContent>
 
-                        </Dialog>
-                    </div>
-
-                </div>
-
-
-
-            </Container>
-
+                </Dialog>
+            </div>
 
         </>
     )

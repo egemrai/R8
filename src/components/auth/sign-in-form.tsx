@@ -20,7 +20,7 @@ import {
     FieldLabel,
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
-import { signInAction } from "@/app/actions/auth"
+import { signInAction } from "@/actions/auth"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { authClient } from "@/lib/auth-client"

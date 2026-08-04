@@ -13,21 +13,7 @@ export async function ProfilePage() {
     return (
         <>
 
-            <Container >
-                <h1 className={`${style.egem} font-bold text-5xl text-end`}>renk güzel</h1>
-                <div className={`${style.grid_div}`}>
-                    <AccountLeftPanel />
-
-                    <div>
-                        <AccountProfile />
-
-                    </div>
-
-                </div>
-
-
-
-            </Container>
+            <AccountProfile />
 
 
         </>

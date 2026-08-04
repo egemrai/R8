@@ -7,24 +7,12 @@ import Link from "next/link"
 import { ChangePasswordForm } from "@/components/account/change-password-form"
 import AccountLeftPanel from "@/components/account/account-left-panel"
 
-export async function UserInfoPage() {
+export async function ChangePasswordPage() {
 
     return (
         <>
 
-            <Container >
-                <h1 className={`${style.egem} font-bold text-5xl text-end`}>renk güzel</h1>
-                <div className={`${style.grid_div}`}>
-                    <AccountLeftPanel />
-                    <div>
-                        <ChangePasswordForm />
-                    </div>
-
-                </div>
-
-
-
-            </Container>
+            <ChangePasswordForm />
 
 
         </>
@@ -32,6 +20,6 @@ export async function UserInfoPage() {
 
 }
 
-export default UserInfoPage
+export default ChangePasswordPage
 
 //egem

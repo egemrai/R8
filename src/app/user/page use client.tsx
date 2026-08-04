@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button"
 import { authClient } from "@/lib/auth-client"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import Image from "next/image"
-import { followAction, unfollowAction } from "../actions/follow"
+import { followAction, unfollowAction } from "../../actions/follow"
 
 export default function UserProfilePage() {
 

@@ -82,57 +82,53 @@ function setUsersIndexBody(users: any) {
 
 
 export async function indexUsersToElasticSearch() {
-  try {
-    const usersData = await getUsersData()
-    if (!usersData) {
-      throw new Error("No users data");
-    }
-
-    const body = setUsersIndexBody(usersData)
-
-    await ensureUsersIndex()
-
-    const results: any = []
-    const failed: any = []
-    let total: number = 0
-
-
-    const chunk = 1000
-
-    for (let i = 0; i < body.length; i += chunk) {
-      const slicedBody = body.slice(i, i + chunk)
-
-      const result = await elasticSearchClient.bulk({ body: slicedBody }) // bulk fonksiyonu için parametre adı "body" olmak zorundaymış, o yüzden body: slicedBody yaptım
-
-      results.push(result)
-      total += result.items.length
-    }
-
-
-    for (const result of results) {
-      result.items.forEach((item: any) => {
-
-        const op = item.index || item.create || item.update
-        // item bunlardan biri olduğu için yukarıda op tanımladık, bulk index log çıktısında ayrıntılı anlarsın; masaüstü ssde var
-
-        if (op?.error) {
-          failed.push({
-            id: op._id,
-            error: op.error,
-            status: op.status
-          })
-        }
-      })
-    }
-
-
-    // console.log('users 100% successfully indexed to ES')
-    // console.log('users indexed to ES with min 1 error(s)')
-    console.log(`bulk index users-> total: ${total || '?'}, success: ${total - failed.length || '?'}, failed: ${failed.length || '?'}`)
-    return { message: `bulk index users-> total: ${total || '?'}, success: ${total - failed.length || '?'}, failed: ${failed.length || '?'}` }
-  } catch (error) {
-    console.error(error)
+  const usersData = await getUsersData()
+  if (!usersData) {
+    throw new Error("No users data");
   }
+
+  const body = setUsersIndexBody(usersData)
+
+  await ensureUsersIndex()
+
+  const results: any = []
+  const failed: any = []
+  let total: number = 0
+
+
+  const chunk = 1000
+
+  for (let i = 0; i < body.length; i += chunk) {
+    const slicedBody = body.slice(i, i + chunk)
+
+    const result = await elasticSearchClient.bulk({ body: slicedBody }) // bulk fonksiyonu için parametre adı "body" olmak zorundaymış, o yüzden body: slicedBody yaptım
+
+    results.push(result)
+    total += result.items.length
+  }
+
+
+  for (const result of results) {
+    result.items.forEach((item: any) => {
+
+      const op = item.index || item.create || item.update
+      // item bunlardan biri olduğu için yukarıda op tanımladık, bulk index log çıktısında ayrıntılı anlarsın; masaüstü ssde var
+
+      if (op?.error) {
+        failed.push({
+          id: op._id,
+          error: op.error,
+          status: op.status
+        })
+      }
+    })
+  }
+
+  // console.log('users 100% successfully indexed to ES')
+  // console.log('users indexed to ES with min 1 error(s)')
+  console.log(`bulk index users-> total: ${total || '?'}, success: ${total - failed.length || '?'}, failed: ${failed.length || '?'}`)
+  return { message: `bulk index users-> total: ${total || '?'}, success: ${total - failed.length || '?'}, failed: ${failed.length || '?'}` }
+
 
 
 }

@@ -29,7 +29,7 @@ import {
     InputGroupText,
     InputGroupTextarea,
 } from "@/components/ui/input-group"
-import { signUpAction } from "@/app/actions/auth"
+import { signUpAction } from "@/actions/auth"
 import Link from "next/link"
 import { redirect, useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
