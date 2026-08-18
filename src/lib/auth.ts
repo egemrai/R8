@@ -1,9 +1,12 @@
+import 'server-only'
+
 import { APIError, betterAuth } from "better-auth"
 import { prismaAdapter } from "better-auth/adapters/prisma"
 import prisma from "./prisma"
 import { nextCookies } from "better-auth/next-js"
 import { username } from "better-auth/plugins"
 import { headers } from "next/headers"
+import { indexUserJob } from "@/jobs/producers/user"
 
 export const auth = betterAuth({
     database: prismaAdapter(prisma, {
@@ -37,6 +40,9 @@ export const auth = betterAuth({
                         },
                     };
                 },
+                after: async (user: any, ctx) => {
+                    await indexUserJob(user.id)
+                }
             },
         },
         session: {
@@ -52,7 +58,7 @@ export const auth = betterAuth({
                     // }
                     // console.log('şu anlık session_:', session_)
 
-                    console.log('şu an giriş yapılacak olan session ön bilgileri:', session)
+                    // // console.log('şu an giriş yapılacak olan session ön bilgileri:', session)
 
                     const MAX_SESSIONS = 4
 

@@ -3,19 +3,15 @@ import { elasticSearchClient } from "@/lib/elasticSearch"
 import prisma from "@/lib/prisma"
 import { ensureFollowsIndex } from "./ensureİndex"
 
-// tek offerı ESye kaydetmek için , worker offer.ts içinde kullanılıyor create ve edit kısmında
-export async function indexJustOneOffer(doc: any) {
+// follow yapınca worker ile bu çalışcak
+export async function indexJustOneFollow(doc: any) {
   try {
-    const { _id: id, sellerId, ...docWithNo_id } = doc  // const id = doc._id ile aynı şey
+    const { _id: id, ...docWithNo_id } = doc  // const id = doc._id ile aynı şey
     await elasticSearchClient.index({
       index: "follows",
-      id: id.toString(),
+      id: String(id),
       document: {
         ...docWithNo_id,  //document içinde ES id kabul etmediği için çıkardım
-        sellerId: sellerId._id,
-        sellerUsername: sellerId.username, // reindexToEs kısmında populate var diye böyle username alabildim
-        // _id: id,
-        // sellerId: String(docWithNo_id.sellerId),
 
       },
     })
@@ -26,6 +22,8 @@ export async function indexJustOneOffer(doc: any) {
 }
 
 //BULK INDEX FOLLOWS  KISMI
+
+
 export async function getFollowsData() {
   try {
     const follows = await prisma.follow.findMany(
@@ -90,55 +88,46 @@ function setFollowsIndexBody(follows: any) {
 
 
 export async function indexFollowsToElasticSearch() {
-  try {
-    const followsData = await getFollowsData()
-    if (!followsData) {
-      throw new Error("No follows data");
-    }
+  const followsData = await getFollowsData()
+  if (!followsData) {
+    throw new Error("No follows data");
+  }
 
-    const body = setFollowsIndexBody(followsData)
+  const body = setFollowsIndexBody(followsData)
 
-    await ensureFollowsIndex()
+  await ensureFollowsIndex()
 
-    const results: any = []
-    const failed: any = []
-    let total: number = 0
-
-
-    const chunk = 1000
-
-    for (let i = 0; i < body.length; i += chunk) {
-      const slicedBody = body.slice(i, i + chunk)
-
-      const result = await elasticSearchClient.bulk({ body: slicedBody })
-
-      results.push(result)
-      total += result.items.length
-    }
+  const results: any = []
+  const failed: any = []
+  let total: number = 0
 
 
-    for (const result of results) {
-      result.items.forEach((item: any) => {
+  const chunk = 1000
 
-        const op = item.index || item.create || item.update
+  for (let i = 0; i < body.length; i += chunk) {
+    const slicedBody = body.slice(i, i + chunk)
 
-        if (op?.error) {
-          failed.push({
-            id: op._id,
-            error: op.error,
-            status: op.status
-          })
-        }
-      })
-    }
+    const result = await elasticSearchClient.bulk({ body: slicedBody })
 
-
-
-    console.log(`bulk index follows-> total: ${total || '?'}, success: ${total - failed.length || '?'}, failed: ${failed.length || '?'}`)
-    return { message: `bulk index follows-> total: ${total || '?'}, success: ${total - failed.length || '?'}, failed: ${failed.length || '?'}` }
-  } catch (error) {
-    console.error(error)
+    results.push(result)
+    total += result.items.length
   }
 
 
+  for (const result of results) {
+    result.items.forEach((item: any) => {
+
+      const op = item.index || item.create || item.update
+
+      if (op?.error) {
+        failed.push({
+          id: op._id,
+          error: op.error,
+          status: op.status
+        })
+      }
+    })
+  }
+
+  return { message: `bulk index follows-> total: ${total || '?'}, success: ${total - failed.length || '?'}, failed: ${failed.length || '?'}` }
 }

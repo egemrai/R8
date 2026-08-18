@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev --webpack",
-    "worker:email": "tsx watch src/jobs/workers/email.ts",
+    "worker:user": "tsx watch src/jobs/workers/user.ts",
     "build": "next build",
     "start": "next start",
     "lint": "eslint"

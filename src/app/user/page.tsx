@@ -51,28 +51,15 @@ export default async function UserProfilePage({
             where: {
                 username: username,
             }, include: {
-                followers: {
-                    include: {
-                        follower: {
-                            select: {
-                                username: true,
-                                image: true
-                            }
-                        }
-                    }
-                },
+                followers: true,
                 following: true,
                 posts: true,
             },
         })
-        console.log('jsonRes:', user)
+        // console.log('jsonRes:', user)
 
 
         if (!user) throw Error('user missing')
-
-
-        console.log('session:', session)
-
 
         isFollowing = isFollowingCheck()
 

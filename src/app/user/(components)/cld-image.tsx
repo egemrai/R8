@@ -3,14 +3,14 @@
 import { CldImage } from "next-cloudinary"
 
 interface CldImageProps {
-    user: any
+    image: string
 }
 
-export function UserCldImage({ user }: CldImageProps) {
+export function UserCldImage({ image }: CldImageProps) {
 
     return (
         <CldImage
-            src={user.image}
+            src={image}
             width={50}
             height={50}
             alt="avatar"

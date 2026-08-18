@@ -7,6 +7,7 @@ import Image from "next/image"
 import FollowAndMessage from "./follow-and-message"
 import { FollowAndFollower } from "./follow_and_follower_count"
 import { FollowModal } from "./follow-modal"
+import { getProfileImageSource, userImageLetter } from "@/utils/user-image-letter"
 
 interface ProfileClientProps {
     user: any
@@ -22,23 +23,28 @@ export function ProfileClient({
     username
 }: ProfileClientProps) {
 
+
+
     const [isFollowing, setIsFollowing] = useState<boolean>(initialIsFollowing)
     const [followersCount, setFollowersCount] = useState(user.followers.length)
     const [pending, setPending] = useState(false)
 
     const [followModalOpen, setFollowModalOpen] = useState(false) //modal
-    const [followSwitch, setFollowSwitch] = useState<'following' | 'followers'>('following') //modal
+    const [followSwitch, setFollowSwitch] = useState<'following' | 'follower'>('following') //modal
+
+
+
 
     return (
         <Card className="flex flex-col ">
             <CardHeader className="flex flex-row gap-6 items-center ">
                 {user.image ?
                     <UserCldImage
-                        user={user}
+                        image={user.image}
                     />
                     : username ?
                         <Image
-                            src={`/pp/${username.charAt(0).toLowerCase()}.png`}
+                            src={getProfileImageSource(username)}
                             width={50}
                             height={50}
                             alt="avatar"
@@ -94,6 +100,8 @@ export function ProfileClient({
                     setFollowModalOpen={setFollowModalOpen}
                     followSwitch={followSwitch}
                     setFollowSwitch={setFollowSwitch}
+                    user={user}
+                    session={session}
                 />
 
             </CardContent>

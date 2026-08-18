@@ -2,7 +2,8 @@
 
 import { Button } from "@/components/ui/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { unfollowAction, followAction } from "../actions.ts/follow"
+import { unfollowAction, followAction } from "../../../actions/follow"
+import { toast } from "sonner"
 
 interface FollowAndMessageProps {
     user: any
@@ -20,35 +21,37 @@ export default function FollowAndMessage({ user, session, username, isFollowing,
 
 
 
-    const handleFollow = async () => {
+    const handleFollowAction = async () => {
         try {
             if (pending) return
             setPending(true)
             setIsFollowing(true)
             setFollowersCount(prev => prev + 1)
-            await followAction(user.id)
-
-        } catch {
+            await followAction(user.id, user.username, user.image ?? '')
+            toast.success("Followed!")
+        } catch (error) {
             // Rollback
             setIsFollowing(false)
             setFollowersCount(prev => prev - 1)
+            toast.error("Failed to follow", { description: String(error) })
         } finally {
             setPending(false)
         }
     }
 
-    const handleUnfollow = async () => {
+    const handleUnfollowAction = async () => {
         try {
             if (pending) return
             setPending(true)
             setIsFollowing(false)
             setFollowersCount(prev => prev - 1)
-            const unfreturn = await unfollowAction(user.id)
-            console.log('unfreturn:', unfreturn)
-            // router.refresh()  //bunu dene sayfa yenilemesi için 
-        } catch {
+            await unfollowAction(user.id)
+            toast.success("Unfollowed!")
+
+        } catch (error) {
             setIsFollowing(true)
             setFollowersCount(prev => prev + 1)
+            toast.error("Failed to unfollow", { description: String(error) })
         } finally {
             setPending(false)
         }
@@ -78,11 +81,11 @@ export default function FollowAndMessage({ user, session, username, isFollowing,
                                 <DropdownMenuItem asChild>
                                     {isFollowing
                                         ?
-                                        <Button disabled={pending} onClick={handleUnfollow}>
+                                        <Button disabled={pending} onClick={handleUnfollowAction}>
                                             {'Unfollow'}
                                         </Button>
                                         :
-                                        <Button disabled={pending} onClick={handleFollow}>
+                                        <Button disabled={pending} onClick={handleFollowAction}>
                                             {"Follow"}
                                         </Button>
                                     }

@@ -42,9 +42,9 @@ services:
       retries: 10
       start_period: 20s
 
-  worker-email:
+  worker-user:
     build: .
-    container_name: email-worker-dev
+    container_name: user-worker-dev
     volumes:
       - .:/app
       - /app/node_modules
@@ -54,7 +54,7 @@ services:
     depends_on:
       - redis
       - elasticsearch
-    command: npm run worker:email
+    command: npm run worker:user
     env_file:
       - .env.development
 

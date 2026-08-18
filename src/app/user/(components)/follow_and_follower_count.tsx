@@ -9,13 +9,27 @@ interface FollowAndFollowerProps {
     user: any
     followersCount: number
     setFollowModalOpen: React.Dispatch<React.SetStateAction<boolean>>
-    setFollowSwitch: React.Dispatch<React.SetStateAction<'following' | 'followers'>>
+    setFollowSwitch: React.Dispatch<React.SetStateAction<'following' | 'follower'>>
 }
 
 export function FollowAndFollower({ user, followersCount, setFollowModalOpen, setFollowSwitch }: FollowAndFollowerProps) {
 
     return (
         <>
+
+            <div onClick={() => {
+                setFollowModalOpen(true)
+                setFollowSwitch('follower')
+            }
+            }
+                className="flex flex-col items-center hover:cursor-pointer">
+                <p className="overflow-hidden">
+                    {followersCount}
+                </p>
+                <p className="overflow-hidden">
+                    Follower
+                </p>
+            </div>
             <div onClick={() => {
                 setFollowModalOpen(true)
                 setFollowSwitch('following')
@@ -26,19 +40,6 @@ export function FollowAndFollower({ user, followersCount, setFollowModalOpen, se
                 </p>
                 <p className="overflow-hidden">
                     Following
-                </p>
-            </div>
-            <div onClick={() => {
-                setFollowModalOpen(true)
-                setFollowSwitch('followers')
-            }
-            }
-                className="flex flex-col items-center hover:cursor-pointer">
-                <p className="overflow-hidden">
-                    {followersCount}
-                </p>
-                <p className="overflow-hidden">
-                    Follower
                 </p>
             </div>
 

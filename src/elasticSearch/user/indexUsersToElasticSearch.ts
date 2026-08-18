@@ -2,64 +2,100 @@
 import { elasticSearchClient } from "@/lib/elasticSearch"
 import prisma from "@/lib/prisma"
 import { ensureUsersIndex } from "@/elasticSearch/user/ensureİndex"
+import { setElasticSearchSyncAtUserDB } from "@/jobs/producers/user"
 
-// tek offerı ESye kaydetmek için , worker offer.ts içinde kullanılıyor create ve edit kısmında
-export async function indexJustOneOffer(doc: any) {
-  try {
-    const { _id: id, sellerId, ...docWithNo_id } = doc  // const id = doc._id ile aynı şey
-    await elasticSearchClient.index({
-      index: "offers",
-      id: id.toString(),
-      document: {
-        ...docWithNo_id,  //document içinde ES id kabul etmediği için çıkardım
-        sellerId: sellerId._id,
-        sellerUsername: sellerId.username, // reindexToEs kısmında populate var diye böyle username alabildim
-        // _id: id,
-        // sellerId: String(docWithNo_id.sellerId),
-
-      },
-    })
-  } catch (error) {
-    console.error(error)
-  }
-
+export interface User {  //ayar çek
+  id: string
+  username: string
+  image: string
+  followersCount: number
+  followingCount: number
+  postsCount: number,
+  emailVerified: boolean
+  role: 'admin' | 'user'
+  createdAt: Date
 }
 
-//BULK INDEX USERS  KISMI
-export async function getUsersData() {
-  try {
-    const users = await prisma.user.findMany(
-      {
-        include: {
-          followers: true,
-          following: true,
-          posts: true
-        },
-      }
-    )
+export interface ElasticSearchUser {
+  id: string
+  username: string
+  image: string
+  followersCount: number
+  followingCount: number
+  postsCount: number,
+  emailVerified: boolean
+  role: 'admin' | 'user'
+  createdAt: Date
+}
 
-    const editedUsersForElasticSearch = users.map((user: any) => {
+// tek userı ESye kaydetmek için , worker içinde kullanılıyor auth after signup
+export async function indexJustOneUser(userId: string) {
 
-      return (
-        {
-          id: user.id,
-          username: user.username,
-          image: user.image,
-          followersCount: user.followers.length || 0,
-          followingCount: user.following.length || 0,
-          postsCount: user.posts.length || 0,
-          emailVerified: user.emailVerified,
-          role: user.role,
-          createdAt: user.createdAt
-        }
-      )
-    })
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    include: {
+      followers: true,
+      following: true,
+      posts: true
+    },
+  }
+  )
 
-    return editedUsersForElasticSearch
-  } catch (error) {
-    console.error(error)
+  if (!user) throw new Error('indexJustOneUser no user')
+
+  const editedUsersForElasticSearch = {
+    id: user.id,
+    username: user.username,
+    image: user.image,
+    followersCount: user.followers.length || 0,
+    followingCount: user.following.length || 0,
+    postsCount: user.posts.length || 0,
+    emailVerified: user.emailVerified,
+    role: user.role,
+    createdAt: user.createdAt
   }
 
+  const { id, ...userWithNoId } = editedUsersForElasticSearch
+  await elasticSearchClient.index({
+    index: "users",
+    id: String(id),
+    document: {
+      ...userWithNoId,
+    },
+  })
+}
+
+//BULK INDEX USERS KISMI
+export async function getUsersData() {
+
+  const users = await prisma.user.findMany(
+    {
+      include: {
+        followers: true,
+        following: true,
+        posts: true
+      },
+    }
+  )
+
+  const editedUsersForElasticSearch = users.map((user: any) => {
+
+    return (
+      {
+        id: user.id,
+        username: user.username,
+        image: user.image,
+        followersCount: user.followers.length || 0,
+        followingCount: user.following.length || 0,
+        postsCount: user.posts.length || 0,
+        emailVerified: user.emailVerified,
+        role: user.role,
+        createdAt: user.createdAt
+      }
+    )
+  })
+
+  return editedUsersForElasticSearch
 }
 
 function setUsersIndexBody(users: any) {
@@ -82,7 +118,7 @@ function setUsersIndexBody(users: any) {
 
 
 export async function indexUsersToElasticSearch() {
-  const usersData = await getUsersData()
+  const usersData: ElasticSearchUser[] = await getUsersData()
   if (!usersData) {
     throw new Error("No users data");
   }
@@ -93,6 +129,7 @@ export async function indexUsersToElasticSearch() {
 
   const results: any = []
   const failed: any = []
+  const succeeded: any = []
   let total: number = 0
 
 
@@ -121,12 +158,21 @@ export async function indexUsersToElasticSearch() {
           status: op.status
         })
       }
+      else {
+        succeeded.push(
+          op._id
+        )
+      }
     })
   }
 
-  // console.log('users 100% successfully indexed to ES')
-  // console.log('users indexed to ES with min 1 error(s)')
-  console.log(`bulk index users-> total: ${total || '?'}, success: ${total - failed.length || '?'}, failed: ${failed.length || '?'}`)
+  setElasticSearchSyncAtUserDB(succeeded)
+
+  // console.log('succeeded:', succeeded)  
+  // succeeded: [
+  // 'Z5KJsXjXtsT7Kjacr4hOIMFIKpU098gR',
+  // 'sTU45UBHNiTIEAv7JyWWuOsOrCWSuVry', ]
+
   return { message: `bulk index users-> total: ${total || '?'}, success: ${total - failed.length || '?'}, failed: ${failed.length || '?'}` }
 
 
