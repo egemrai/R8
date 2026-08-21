@@ -98,6 +98,50 @@ export async function unfollowAction(targetUserId: string) {
 
 }
 
+
+export async function makeFollowerUnfollowAction(targetUserId: string) {
+
+    const session = await auth.api.getSession({
+        headers: await headers(),
+    })
+
+    if (!session?.user) {
+        throw new Error('Unauthorized')
+    }
+
+    const currentUserId = session.user.id
+
+    const existing = await prisma.follow.findFirst({
+        where: {
+            followerId: targetUserId,
+            followingId: currentUserId,
+        },
+    })
+
+    if (!existing) {
+        throw new Error('Was not Following')
+    }
+
+    await prisma.follow.delete({
+        where: {
+            followerId_followingId: {
+                followerId: targetUserId,
+                followingId: currentUserId,
+            },
+        },
+    })
+
+    //deleteFollowRes sağlamsa -> ES worker delete-follow
+    const editedUserIdsForElasticSearch = {
+        followerId: currentUserId,
+        followingId: targetUserId
+    }
+    await deleteFollowJob(editedUserIdsForElasticSearch)
+
+}
+
+
+
 export async function isFollowingAction(targetUserId: string) {
 
     const session = await auth.api.getSession({

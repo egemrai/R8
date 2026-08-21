@@ -9,7 +9,7 @@ import { Button } from "../ui/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../ui/dropdown-menu"
 import { Menu } from "lucide-react"
 import { useEffect, useState } from "react"
-import { followAction, isFollowingAction, unfollowAction } from "@/actions/follow"
+import { followAction, isFollowingAction, makeFollowerUnfollowAction, unfollowAction } from "@/actions/follow"
 import { toast } from "sonner"
 
 
@@ -137,6 +137,35 @@ const FollowUserCard = ({ selfProfile, followType, follow, isFollowing, setIsFol
             }
 
             toast.error("Failed to unfollow", { description: String(error) })
+        } finally {
+            setPending(false)
+        }
+    }
+
+    //kendi profilinde followingler içinden unf yapma
+    const handleMakeFollowerUnfollowAction = async () => {
+        try {
+            if (pending) return
+            setPending(true)
+
+            setFollows(prev => {
+                return (
+                    prev.filter((_, i) =>
+                        index !== i
+                    )
+                )
+            }
+            )
+            await makeFollowerUnfollowAction(followType === 'follower' ? follow.followerId : follow.followingId)
+            toast.success("Follower removed!")
+        }
+        catch (error) {
+            setFollows(prev => {
+                const newFollows = [...prev]
+                newFollows.splice(index, 0, follow!)
+                return newFollows
+            })
+            toast.error("Failed to remove follower", { description: String(error) })
         } finally {
             setPending(false)
         }
@@ -294,9 +323,9 @@ const FollowUserCard = ({ selfProfile, followType, follow, isFollowing, setIsFol
 
 
 
-                                    <DropdownMenuItem onClick={() => console.log('ege')
+                                    <DropdownMenuItem onClick={handleMakeFollowerUnfollowAction
                                     } asChild>
-                                        <p>ege</p>
+                                        <p>Remove follower</p>
                                     </DropdownMenuItem>
 
                                 </DropdownMenu>
