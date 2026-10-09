@@ -43,24 +43,6 @@ export function FollowAndFollower({ user, followersCount, setFollowModalOpen, se
                 </p>
             </div>
 
-            {/* <Dialog>
-                <DialogTrigger asChild>
-                    <div onClick={() => toast('yuh')}
-                        className="flex flex-col items-center hover:cursor-pointer">
-                        <p className="overflow-hidden">
-                            {followersCount}
-                        </p>
-                        <p className="overflow-hidden">
-                            Follower
-                        </p>
-                    </div>
-                </DialogTrigger>
-                <DialogContent className="w-[95vw] max-w-lg max-h-[90vh] overflow-y-auto">
-                    <DialogHeader>
-                        <DialogTitle>ege</DialogTitle>
-                    </DialogHeader>
-                </DialogContent>
-            </Dialog> */}
 
             <Button className=" ml-auto bg-white text-black">
                 ...

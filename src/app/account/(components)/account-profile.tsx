@@ -2,20 +2,36 @@
 
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle, } from "@/components/ui/card"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
-import { Button } from "../ui/button"
+import { Button } from "../../../components/ui/button"
 import { authClient } from "@/lib/auth-client"
-import { useCallback, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import { useDropzone } from "react-dropzone"
 import { CldImage } from "next-cloudinary"
 import Cropper from 'react-easy-crop'
 import { getCroppedImg } from "@/lib/cropImage"
-import { Edit } from "lucide-react"
+import { Edit, Trash } from "lucide-react"
 import Image from "next/image"
+import { toast } from "sonner"
+import { useRouter } from "next/navigation"
 
 export function AccountProfile() {
 
+    const router = useRouter()
+
+    const {
+        data: session,
+        isPending,
+    } = authClient.useSession()
+
+    useEffect(() => {
+        if (!isPending && !session) {
+            router.replace("/")
+        }
+    }, [isPending, session, router])
+
 
     const [isUploading, setIsUploading] = useState(false)
+    const [isDeleting, setIsDeleting] = useState(false)
 
     const [selectedFile, setSelectedFile] = useState<File | null>(null)
     const [previewUrl, setPreviewUrl] = useState("")
@@ -24,12 +40,34 @@ export function AccountProfile() {
     const [zoom, setZoom] = useState(1)
     const [croppedAreaPixels, setCroppedAreaPixels] = useState<any>(null)
 
-    const [usernameFirstLetter, setusernameFirstLetter] = useState<string>('e')
 
-    const {
-        data: session,
-        isPending,
-    } = authClient.useSession()
+    const deleteImage = async () => {
+        setIsDeleting(true)
+        try {
+            const res = await fetch("/api/user/delete-image", {
+                method: "POST",
+            })
+
+            const data = await res.json()
+
+            if (!res.ok) {
+                throw new Error(data.error ?? "Failed to delete image")
+            }
+
+            await authClient.getSession({
+                query: { disableCookieCache: true },
+            })
+
+            toast.success('Profile image successfully deleted.')
+        } catch (error) {
+            toast.error("Failed to delete image.", {
+                description: String(error),
+            })
+        } finally {
+            setIsDeleting(false)
+        }
+
+    }
 
     const onCropComplete = useCallback(
         (_: any, croppedAreaPixels: any) => {
@@ -38,27 +76,6 @@ export function AccountProfile() {
         },
         []
     )
-
-    async function uploadImage(file: File) {
-        const formData = new FormData()
-
-        formData.append("file", file)
-        formData.append("upload_preset", "profile_images")
-
-        const res = await fetch(  // console.log image-cloudinary-POST-fetch-return içinde var
-            `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`,
-            {
-                method: "POST",
-                body: formData,
-            }
-        )
-
-        const data = await res.json()
-
-        console.log('imgdata:', data)
-
-        return data.public_id  //secure?url verince cldimage çalışmıyor, public_id istiyor
-    }
 
     async function handleConfirm() {
         if (!selectedFile || !croppedAreaPixels) return
@@ -79,35 +96,30 @@ export function AccountProfile() {
                 }
             )
 
-            const publicId = await uploadImage(croppedFile)
+            const formData = new FormData()
+            formData.append("file", croppedFile)
 
-            if (publicId) {
-                const res = await fetch("/api/user/add-image", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({
-                        image: publicId,
-                    }),
-                })
+            //FormData kullanınca content-type yazılmıyor, kendisi otomatik ekliyor
+            const res = await fetch("/api/user/add-image", {
+                method: "POST",
+                body: formData,
+            })
 
-                const data = await res.json()
-                //alttaki databaseden önceki user pp silme requesti. bullmq yükleyince q'ya ekle
-                if (data.success && session?.user?.image) {
-                    await fetch("/api/user/delete-image", {
-                        method: "POST",
-                        body: JSON.stringify({
-                            publicId: session?.user?.image,
-                        }),
-                    })
+            const data = await res.json()
 
-                }
+            if (!res.ok) {
+                throw new Error(data.error ?? "Failed to upload image")
             }
 
+            await authClient.getSession({
+                query: { disableCookieCache: true },
+            })
 
+            toast.success('Profile image successfully uploaded.')
         } catch (error) {
-            console.log(error)
+            toast.error("Failed to upload image.", {
+                description: String(error),
+            })
         }
         finally {
             setIsUploading(false)
@@ -123,7 +135,7 @@ export function AccountProfile() {
 
             setSelectedFile(file)
 
-            const localPreview = URL.createObjectURL(file)
+            const localPreview = URL.createObjectURL(file)  // yüklenen fotonun geçici olarak gösterilmesini sağlayan fonksiyon
 
             setPreviewUrl(localPreview)
 
@@ -143,7 +155,7 @@ export function AccountProfile() {
 
     return (
         <Card className="flex flex-col p-4 border">
-            <div className="flex flex-row w-full h-full items-center gap-4">
+            <div className="flex flex-row w-full h-full items-center gap-2">
                 {session?.user?.image ?
                     <>
                         <CldImage
@@ -269,13 +281,19 @@ export function AccountProfile() {
 
                         <Button
                             onClick={handleConfirm}
-                            disabled={!selectedFile || isUploading}
+                            disabled={!selectedFile || isUploading || isDeleting}
                         >
                             {isUploading ? "Uploading..." : "Confirm"}
                         </Button>
                     </DialogContent>
 
                 </Dialog>
+
+                <Button className="bg-red-500 text-white rounded-full w-10 h-10 cursor-pointer"
+                    onClick={deleteImage}
+                    disabled={isDeleting || isUploading}>
+                    <Trash />
+                </Button>
 
             </div>
 

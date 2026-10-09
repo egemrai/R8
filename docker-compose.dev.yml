@@ -58,5 +58,18 @@ services:
     env_file:
       - .env.development
 
+  payment-service:
+    build:
+      context: ./services/payment-service
+      dockerfile: Dockerfile
+    ports:
+      - "5001:5001"
+  api-gateway:
+    build:
+      context: ./api-gateway
+      dockerfile: Dockerfile
+    ports:
+      - "4000:4000"
+
 volumes:
   es-data:

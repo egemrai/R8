@@ -4,8 +4,8 @@ import {
     Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle,
 } from "@/components/ui/card"
 import Link from "next/link"
-import { ChangePasswordForm } from "@/components/account/change-password-form"
-import AccountLeftPanel from "@/components/account/account-left-panel"
+import { ChangePasswordForm } from "@/app/account/(components)/change-password-form"
+import AccountLeftPanel from "@/app/account/(components)/account-left-panel"
 
 export async function AccountLayout({
     children,

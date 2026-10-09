@@ -95,6 +95,17 @@ export const auth = betterAuth({
         enabled: true,
         minPasswordLength: 1,
         maxPasswordLength: 32,
+        revokeSessionsOnPasswordReset: true,
+        sendResetPassword: async ({ user, url, token }, request) => {
+            // console.log('user:', user)
+            // console.log('reset password url:', url)
+            // console.log('token:', token)
+
+        },
+        onPasswordReset: async ({ user }, request) => {
+            // your logic here
+            console.log(`Password for user ${user.email ?? 'user.email boş'} has been reset.`);
+        },
     },
     plugins: [nextCookies(), username()],
     user: {

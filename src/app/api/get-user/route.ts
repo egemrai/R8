@@ -1,5 +1,8 @@
 import { elasticSearchClient } from "@/lib/elasticSearch";
 
+
+//FOLLOWİNF ID SABİT NEYİ TEST ETMEK İÇİN EKLEDİM HATIRLAMIYORUM
+//random bi test herhalde kullanılmana endpoint
 export async function GET(req: Request) {
     try {
         const res = await elasticSearchClient.search({

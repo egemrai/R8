@@ -165,6 +165,9 @@ export function SignInForm() {
                     <Link className="text-center underline" href={`/sign-up`}>
                         Sign up instead
                     </Link>
+                    <Link className="text-center underline" href={`/send-reset-password`}>
+                        Reset password
+                    </Link>
                 </Field>
             </CardFooter>
         </Card>

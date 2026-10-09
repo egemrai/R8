@@ -58,17 +58,6 @@ export function ChangePasswordForm() {
 
     const router = useRouter()
 
-    // const {
-    //     data: session,
-    //     isPending,
-    // } = authClient.useSession()
-
-    // useEffect(() => {
-    //     if (session) {
-    //         router.push("/")
-    //     }
-    // }, [session])
-
     const [currentPasswordInputType, setCurrentPasswordInputType] = useState<"text" | "password">('password')
     const [newPasswordInputType, setNewPasswordInputType] = useState<"text" | "password">('password')
     const [confirmPasswordInputType, setConfirmPasswordInputType] = useState<"text" | "password">('password')

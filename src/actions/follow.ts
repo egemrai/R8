@@ -133,8 +133,8 @@ export async function makeFollowerUnfollowAction(targetUserId: string) {
 
     //deleteFollowRes sağlamsa -> ES worker delete-follow
     const editedUserIdsForElasticSearch = {
-        followerId: currentUserId,
-        followingId: targetUserId
+        followerId: targetUserId,
+        followingId: currentUserId
     }
     await deleteFollowJob(editedUserIdsForElasticSearch)
 

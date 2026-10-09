@@ -34,7 +34,7 @@ export function FollowModal({ followModalOpen, setFollowModalOpen, followSwitch,
     const routeUsername = searchParams.get('username')
 
     //linkteki username ile session username aynı mı kontrol 
-    const selfProfileCheck = session.user.username === routeUsername
+    const selfProfileCheck = session?.user.username === routeUsername
 
     const [follows, setFollows] = useState<EditedFollow[]>([])
     const [isFollowings, setIsFollowings] = useState<IsFollowingsProps[]>([])
@@ -67,7 +67,7 @@ export function FollowModal({ followModalOpen, setFollowModalOpen, followSwitch,
         if (!user) return
         if (!followSwitch) return
 
-        console.log('fetchIsers çalıştı -> searchInput:', searchInput);
+        // console.log('fetchIsers çalıştı -> searchInput:', searchInput);
 
 
         setLoading(true)
@@ -91,9 +91,9 @@ export function FollowModal({ followModalOpen, setFollowModalOpen, followSwitch,
 
             const data = await res.json()
 
-            console.log('searchAfter:', data.searchAfter);
-            console.log('follows:', data.follows);
-            console.log('hasMore:', data.hasMore);
+            // console.log('searchAfter:', data.searchAfter);
+            // console.log('follows:', data.follows);
+            // console.log('hasMore:', data.hasMore);
 
 
             if (reset) {
@@ -151,15 +151,15 @@ export function FollowModal({ followModalOpen, setFollowModalOpen, followSwitch,
 
     async function onSubmit(formData: Record<string, string>) {
         try {
-            console.log('formdata:', formData)
-            console.log('followSwitch:', followSwitch)
+            // console.log('formdata:', formData)
+            // console.log('followSwitch:', followSwitch)
 
             setFollows([])
             setSearchAfter(null)
             setHasMore(true)
             fetchUsers({ reset: true })
         } catch (error) {
-            toast.error("Sign up failed", {
+            toast.error("Search failed", {
                 description: String(error),
             })
         }
@@ -185,7 +185,7 @@ export function FollowModal({ followModalOpen, setFollowModalOpen, followSwitch,
                         setIsFollowings={setIsFollowings}
                         setFollows={setFollows}
                         index={i}
-                        selfUsername={session.user.username}
+                        selfUsername={session?.user.username}
                     />
 
                 ))}
