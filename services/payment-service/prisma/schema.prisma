@@ -1,0 +1,39 @@
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+  moduleFormat = "cjs"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum PaymentStatus {
+  pending
+  completed
+}
+
+model Wallet {
+  id           String   @id @default(cuid())
+  userId       String   @unique
+  balanceCents Int      @default(0)
+  currency     String   @default("USD")
+  payments Payment[]
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Payment {
+  id          String        @id @default(cuid())
+  amountCents Int
+  currency    String        @default("USD")
+  status      PaymentStatus @default(pending)
+  createdAt   DateTime      @default(now())
+  completedAt DateTime?
+
+  walletId String
+  wallet   Wallet @relation(fields: [walletId], references: [id])
+
+  @@index([walletId])
+}

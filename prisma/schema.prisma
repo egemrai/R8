@@ -3,6 +3,26 @@ enum Role {
   admin
 }
 
+// Birleşmiş görselin bölünme yönünü belirler.
+enum SplitDirection {
+  horizontal
+  vertical
+}
+
+// Her parçanın puanının hangi köşede gösterileceğini belirler.
+enum ScoreLocation {
+  //@map, kod içerisinde kullandığın isim ile veritabanında saklanan ismin farklı olmasını sağlar. DBde top-left ile saklanıyor. ben çağırınca console.log topLeft şeklinde 
+  topLeft @map("top-left")
+  topRight @map("top-right")
+  bottomLeft @map("bottom-left")
+  bottomRight @map("bottom-right")
+}
+
+enum PostVisibility {
+  public
+  hidden
+}
+
 generator client {
   provider = "prisma-client"
   output   = "../src/generated/prisma"
@@ -39,6 +59,8 @@ model User {
   sessions      Session[]
   accounts      Account[]
 
+  imageRatings ImageRating[]  // Kullanıcının fotoğraflara verdiği oylarla ilişki kurar.
+
 }
 
 model Session {
@@ -59,11 +81,15 @@ model Session {
 
 model Post {
   id        String @id @default(cuid())
-  title     String
-  content   String?
-  published Boolean @default(false)
+  
+  content   String? // Gönderi mesajı
+  visibility PostVisibility @default(public)
+  direction SplitDirection
 
-  images   PostImage[]  
+
+  mergedImage PostMergedImage? // İlk slaytta gösterilen birleşmiş görselle ilişki kurar.
+  images PostImage[]           // Sonraki slaytlarda ayrı ayrı gösterilen fotoğraflarla ilişki kurar.
+
   comments Comment[]
   likes    Like[]
 
@@ -75,16 +101,71 @@ model Post {
   
 }
 
+// İlk slaytta gösterilecek tek birleşmiş görseli tutar.
+model PostMergedImage {
+  id String @id @default(cuid())
+
+  
+  publicId String @unique  // Cloudinary görselini göstermek ve silmek için kullanılan kimlik.
+  secureUrl String  // Görselin HTTPS adresi.
+
+  width Int
+  height Int
+
+  postId String @unique    // Bir gönderiye en fazla bir birleşmiş görsel bağlanmasını sağlar.
+ 
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)  // Gönderi silinince bu veritabanı kaydı da silinir.
+}
+
 model PostImage {
   id     String @id @default(cuid())
-  publicUrl    String
+
+  publicId    String
   secureUrl    String
+
   width Int
   height    Int
 
-  postId String
-  post   Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+  position Int                                     // Fotoğrafın sırası; sıfırdan başlar ve birleşimdeki sırayla eşleşir.
+  scoreColor String @default("#ffffff")          // Birleşimde bu fotoğrafa ait puan yazısının rengi.
+  scoreLocation ScoreLocation @default(topRight)   // Birleşimde bu fotoğrafa ait puanın gösterileceği köşe.
+
+  ratings ImageRating[]    // Fotoğrafa verilen oylarla ilişki kurar.
+
+  postId String    // Fotoğrafın ait olduğu gönderinin kimliği.
+  
+  post   Post @relation(fields: [postId], references: [id], onDelete: Cascade)  // Gönderi silinince bu fotoğrafın veritabanı kaydı da silinir.
+
+  @@unique([postId, position])   // Aynı gönderide iki fotoğrafın aynı sırayı almasını engeller.
 }
+
+// Kullanıcının bir fotoğrafa verdiği puanı tutar.
+model ImageRating {
+  id String @id @default(cuid())    // Oy kaydının benzersiz kimliği.
+
+  score Int   // Kullanıcının seçtiği puan; backend yalnızca 1–8 kabul etmelidir.
+
+  userId String   // Oy veren kullanıcının kimliği.
+  
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)   // Kullanıcı silinince ona ait oy kaydı da silinir.
+  
+  imageId String  // Oy verilen fotoğrafın kimliği.
+ 
+  image PostImage @relation(fields: [imageId], references: [id], onDelete: Cascade)    // Fotoğraf silinince ona ait oy kaydı da silinir.
+
+  createdAt DateTime @default(now())
+
+  updatedAt DateTime @updatedAt
+
+  // Bir kullanıcının aynı fotoğrafta tek oy kaydı olmasını sağlar.
+  // ikili bağlam gibi -> '123' id'li user '456' id'li image'a puan verdiyse -> id ve image per yapar ve tekrar oluşmaz. 
+  @@unique([userId, imageId])   
+
+  
+  @@index([imageId])     // Fotoğrafın oylarını ve ortalamasını sorgulamayı destekler.
+}
+
+
 
 model Comment {
   id      String @id @default(cuid())

@@ -116,7 +116,7 @@ export function ResetPasswordForm() {
                 <form id="get-reset-password-URL-form" onSubmit={form.handleSubmit(onSubmit)}>
                     <FieldGroup>
                         <Field data-invalid={!!form.formState.errors.newPassword}>
-                            <FieldLabel htmlFor="newPassword">
+                            <FieldLabel htmlFor="imageCount">
                                 New password
                             </FieldLabel>
 

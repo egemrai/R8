@@ -77,6 +77,34 @@ export function AccountProfile() {
         []
     )
 
+
+
+    const onDrop = useCallback(async (acceptedFiles: File[]) => {
+        const file = acceptedFiles[0]
+
+        if (!file) return
+
+        try {
+
+            setSelectedFile(file)
+
+            const localPreview = URL.createObjectURL(file)  // yüklenen fotonun geçici olarak gösterilmesini sağlayan fonksiyon
+
+            setPreviewUrl(localPreview)
+
+        } catch (error) {
+            console.error(error)
+        }
+    }, [])
+
+    const { getRootProps, getInputProps, isDragActive } = useDropzone({
+        onDrop,
+        accept: {
+            "image/*": [],
+        },
+        multiple: false,
+    })
+
     async function handleConfirm() {
         if (!selectedFile || !croppedAreaPixels) return
 
@@ -125,33 +153,6 @@ export function AccountProfile() {
             setIsUploading(false)
         }
     }
-
-    const onDrop = useCallback(async (acceptedFiles: File[]) => {
-        const file = acceptedFiles[0]
-
-        if (!file) return
-
-        try {
-
-            setSelectedFile(file)
-
-            const localPreview = URL.createObjectURL(file)  // yüklenen fotonun geçici olarak gösterilmesini sağlayan fonksiyon
-
-            setPreviewUrl(localPreview)
-
-        } catch (error) {
-            console.error(error)
-        }
-    }, [])
-
-    const { getRootProps, getInputProps, isDragActive } = useDropzone({
-        onDrop,
-        accept: {
-            "image/*": [],
-        },
-        multiple: false,
-    })
-
 
     return (
         <Card className="flex flex-col p-4 border">

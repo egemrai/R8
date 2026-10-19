@@ -23,6 +23,11 @@ const AccountLeftPanel = async () => {
                         Change password
                     </Link>
                 </CardContent>
+                <CardContent >
+                    <Link href="./wallet">
+                        Wallet
+                    </Link>
+                </CardContent>
 
             </Card>
         </div>
