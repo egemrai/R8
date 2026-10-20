@@ -1,4 +1,4 @@
-import ServerButtons from "../(components)/server-buttons"
+import ServerButtons from "../_components/server-buttons"
 
 
 

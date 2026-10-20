@@ -4,7 +4,7 @@ import { Container } from "@/components/egem-ui/Container"
 import { auth } from "@/lib/auth"
 import { headers } from "next/headers"
 import prisma from "@/lib/prisma"
-import { ProfileClient } from "./(components)/profile-Client"
+import { ProfileClient } from "./_components/profile-Client"
 
 export default async function UserProfilePage({
     searchParams,

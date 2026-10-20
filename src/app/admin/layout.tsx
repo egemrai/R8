@@ -1,6 +1,6 @@
 import { Container } from "@/components/egem-ui/Container"
 import style from './admin.module.css'
-import AdminLeftPanel from "@/app/admin/(components)/admin-left-panel";
+import AdminLeftPanel from "@/app/admin/_components/admin-left-panel";
 
 export async function AccountLayout({
     children,

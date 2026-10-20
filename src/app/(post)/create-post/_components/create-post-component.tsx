@@ -115,7 +115,7 @@ const CreatePostComponent = () => {
     }
 
     //Stage 2 veya Stage 3 hazırlanırken düzenleme alanlarını kilitlemek için
-    const isPreparing = stage2NextButtonLoading || stage3NextButtonLoading
+    const isPreparing = stage2NextButtonLoading || stage3NextButtonLoading || stage4PublishButtonLoading
 
     const onDrop = useCallback(async (selectedFiles: File[]) => {
         const fileCheck = selectedFiles[0]
@@ -493,19 +493,42 @@ const CreatePostComponent = () => {
     }
 
     const stage4PublishButtonOnClick = async () => {
+        if (isPreparing) return
         setStage4PublishButtonLoading(true)
         try {
             if (!finalBlob || !finalUrl) {
                 throw new Error("Prepare the merged image before publishing.")
             }
 
-            if (photos.length !== imageCount) {
+            if (photos.length === 0 || photos.length !== imageCount) {
                 throw new Error(`Please select ${imageCount} photos.`)
             }
 
+            const images = await Promise.all(
+                photos.map(async photo => {
+                    if (!photo.stage2Url) {
+                        throw new Error("A photo is not ready for publishing.")
+                    }
+
+                    const response = await fetch(photo.stage2Url)
+
+                    if (!response.ok) {
+                        throw new Error("Failed to read a photo.")
+                    }
+
+                    const blob = await response.blob()
+
+                    if (blob.size === 0) {
+                        throw new Error("A photo is empty.")
+                    }
+
+                    return blob
+                })
+            )
+
+
             const metadata = {
-                message: postMessage.trim(),
-                aspect,
+                content: postMessage.trim(),
                 direction,
                 photos: photos.map((photo, index) => ({
                     position: index,
@@ -516,10 +539,15 @@ const CreatePostComponent = () => {
 
             const formData = new FormData()
 
-            formData.append("image", finalBlob, "post.png")
+            formData.append("mergedImage", finalBlob, "merged.png")
+
+            images.forEach((blob, index) => {
+                formData.append("images", blob, `photo-${index + 1}.png`)
+            })
+
             formData.append("metadata", JSON.stringify(metadata))
 
-            const response = await fetch("/api/posts", {
+            const response = await fetch("/api/post/create-post", {
                 method: "POST",
                 body: formData,
             })
@@ -1056,7 +1084,7 @@ const CreatePostComponent = () => {
 
                     {stage === 4 && !stage3NextButtonLoading &&
                         <div className="flex w-full flex-col gap-4 p-4">
-                            <div className="flex gap-2" role="tablist" aria-label="Photo settings">
+                            <div inert={isPreparing} className="flex gap-2" role="tablist" aria-label="Photo settings">
                                 {photos.map((photo, index) => (
                                     <button
                                         key={photo.id}
@@ -1078,6 +1106,7 @@ const CreatePostComponent = () => {
 
                             {activePhoto && (
                                 <div
+                                    inert={isPreparing}
                                     id="photo-settings-panel"
                                     role="tabpanel"
                                     aria-labelledby={`photo-tab-${activePhoto.id}`}
@@ -1152,6 +1181,7 @@ const CreatePostComponent = () => {
                             <Field>
                                 <FieldLabel htmlFor="post-message">Post message</FieldLabel>
                                 <textarea
+                                    inert={isPreparing}
                                     id="post-message"
                                     value={postMessage}
                                     onChange={event => setPostMessage(event.target.value)}

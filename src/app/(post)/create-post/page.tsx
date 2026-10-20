@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { useForm } from "react-hook-form"
-import CreatePostComponent from "./components/create-post-component"
+import CreatePostComponent from "./_components/create-post-component"
 
 
 

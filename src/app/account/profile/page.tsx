@@ -1,5 +1,5 @@
 
-import AccountProfile from "@/app/account/(components)/account-profile"
+import AccountProfile from "@/app/account/_components/account-profile"
 
 export async function ProfilePage() {
 
